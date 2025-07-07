@@ -1016,13 +1016,42 @@
     flex-direction: column;
   }
   .tf-sidebar {
-    width: 100%;
-    min-height: unset;
-    border-right: none;
-    border-bottom: 1px solid #ececec;
-    flex-direction: row;
-    gap: 1rem;
-    padding: 1rem 0.5rem;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 240px;
+    z-index: 2000;
+    background: #fff;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 2px 0 16px rgba(44,62,80,0.08);
+  }
+  .tf-sidebar.open {
+    transform: translateX(0);
+  }
+  .tf-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.18);
+    z-index: 1999;
+  }
+  .tf-hamburger {
+    display: flex;
+    position: fixed;
+    top: 1.2rem;
+    left: 1.2rem;
+    z-index: 2100;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+    border: none;
+    cursor: pointer;
   }
   .tf-main-content {
     padding: 1.5rem 1rem;
@@ -1042,6 +1071,26 @@
     width: 36px;
     height: 36px;
     font-size: 1.1rem;
+  }
+  .tf-sidebar {
+    width: 80vw;
+    min-width: 0;
+    max-width: 340px;
+    padding: 1.2rem 0.7rem;
+  }
+  .tf-hamburger {
+    width: 48px;
+    height: 48px;
+    top: 0.7rem;
+    left: 0.7rem;
+  }
+  .tf-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  .tf-form-row {
+    gap: 0.7rem;
   }
 }
 
@@ -1661,4 +1710,128 @@
   margin-left: 8px;
   box-shadow: none !important;
   padding: 0 !important;
+}
+
+/* --- Responsive Sidebar Hamburger --- */
+@media (max-width: 900px) {
+  .tf-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 240px;
+    z-index: 2000;
+    background: #fff;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 2px 0 16px rgba(44,62,80,0.08);
+  }
+  .tf-sidebar.open {
+    transform: translateX(0);
+  }
+  .tf-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.18);
+    z-index: 1999;
+  }
+  .tf-hamburger {
+    display: flex;
+    position: fixed;
+    top: 1.2rem;
+    left: 1.2rem;
+    z-index: 2100;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+    border: none;
+    cursor: pointer;
+  }
+}
+@media (max-width: 600px) {
+  .tf-sidebar {
+    width: 80vw;
+    min-width: 0;
+    max-width: 340px;
+    padding: 1.2rem 0.7rem;
+  }
+  .tf-hamburger {
+    width: 48px;
+    height: 48px;
+    top: 0.7rem;
+    left: 0.7rem;
+  }
+}
+
+/* --- Stack form row actions vertically on mobile --- */
+@media (max-width: 600px) {
+  .tf-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  .tf-form-row {
+    gap: 0.7rem;
+  }
+}
+
+/* --- Make tables horizontally scrollable on mobile --- */
+@media (max-width: 700px) {
+  .tf-responses-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tf-responses-table {
+    min-width: 600px;
+  }
+}
+
+/* --- Make modals full-screen on mobile --- */
+@media (max-width: 600px) {
+  .tf-modal {
+    min-width: 0 !important;
+    width: 98vw !important;
+    max-width: 98vw !important;
+    min-height: 98vh !important;
+    max-height: 98vh !important;
+    border-radius: 0.7rem !important;
+    padding: 1.2rem 0.7rem !important;
+    top: 1vh !important;
+    left: 1vw !important;
+  }
+}
+
+/* --- Reduce font sizes and paddings for mobile --- */
+@media (max-width: 480px) {
+  .dashboard-title, .tf-workspace-title {
+    font-size: 1.2rem;
+  }
+  .tf-form-title {
+    font-size: 1rem;
+  }
+  .tf-form-meta {
+    font-size: 0.9rem;
+  }
+  .tf-form-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+  .tf-form-row {
+    padding: 0.7rem 0.4rem;
+  }
+}
+
+/* --- Ensure all buttons are at least 44x44px on mobile --- */
+@media (max-width: 600px) {
+  button, .tf-form-copy-btn, .tf-modal-btn, .tf-hamburger {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 1rem;
+  }
 } 

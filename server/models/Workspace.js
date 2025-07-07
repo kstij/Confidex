@@ -8,4 +8,6 @@ const workspaceSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+workspaceSchema.index({ name: 1, owner: 1 }, { unique: true });
+
 module.exports = mongoose.model('Workspace', workspaceSchema); 

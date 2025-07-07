@@ -719,3 +719,52 @@ html, body {
     padding: 1rem;
   }
 }
+
+@media (max-width: 1200px) {
+  .container, .main-content, .dashboard {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+}
+@media (max-width: 900px) {
+  .container, .main-content, .dashboard {
+    padding: 0 8px;
+  }
+  .sidebar {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+  .container, .main-content, .dashboard {
+    padding: 0 4px;
+  }
+  .dashboard {
+    flex-direction: column;
+  }
+  .table, .responses-table {
+    font-size: 13px;
+    overflow-x: auto;
+    display: block;
+  }
+}
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+  .container, .main-content, .dashboard {
+    padding: 0 2px;
+  }
+  .table, .responses-table {
+    font-size: 12px;
+  }
+  .form-header, .form-container, .card, .modal {
+    padding: 8px !important;
+  }
+  .btn, .submit-btn, .back-btn {
+    font-size: 1em;
+    padding: 8px 12px;
+  }
+}

@@ -49,6 +49,8 @@ const UserDashboard = ({ user }) => {
   const [responsesView, setResponsesView] = useState('responses'); // 'responses' or 'responders'
   const [responsesSearch, setResponsesSearch] = useState('');
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showHamburger, setShowHamburger] = useState(window.innerWidth <= 900);
 
   useEffect(() => {
     fetchWorkspaces();
@@ -59,6 +61,19 @@ const UserDashboard = ({ user }) => {
       fetchWorkspaceForms(selectedWorkspace._id);
     }
   }, [selectedWorkspace]);
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth <= 900) {
+        setShowHamburger(true);
+      } else {
+        setShowHamburger(false);
+        setSidebarOpen(false);
+      }
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchWorkspaces = async () => {
     try {
@@ -456,6 +471,11 @@ const UserDashboard = ({ user }) => {
     navigate('/create-form', { state: { workspaceId: selectedWorkspaceForForm?._id || myWorkspace?._id } });
   };
 
+  // Add effect to close sidebar on route change
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [selectedWorkspace, selectedForm]);
+
   if (error) {
     return (
       <div className="page-section">
@@ -482,10 +502,23 @@ const UserDashboard = ({ user }) => {
 
   return (
     <div className="tf-dashboard-root">
-      {/* Toast */}
-      {toast && <div className="tf-toast">{toast}</div>}
-      {/* Sidebar */}
-      <aside className="tf-sidebar">
+      {/* Hamburger for mobile */}
+      {showHamburger && (
+        <button
+          className="tf-hamburger"
+          aria-label="Open sidebar"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect y="5" width="28" height="3.5" rx="1.75" fill="#222b2f"/>
+            <rect y="12.25" width="28" height="3.5" rx="1.75" fill="#222b2f"/>
+            <rect y="19.5" width="28" height="3.5" rx="1.75" fill="#222b2f"/>
+          </svg>
+        </button>
+      )}
+      {/* Sidebar and backdrop */}
+      {sidebarOpen && <div className="tf-sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
+      <aside className={`tf-sidebar${sidebarOpen ? ' open' : ''}`}>
         <button className="tf-create-form-btn" onClick={handleOpenCreateFormModal}>+ Create a new form</button>
         <div className="tf-sidebar-section tf-sidebar-search">
           <input type="text" placeholder="Search" className="tf-sidebar-search-input" />

@@ -48,17 +48,11 @@ const ensureUserExists = async (req, res, next) => {
     }
 
     // Always check for 'My Workspace' for this user
-    const myWorkspace = await Workspace.findOne({ owner: req.user.uid, name: 'My Workspace' });
-    if (!myWorkspace) {
-      const defaultWorkspace = new Workspace({
-        name: 'My Workspace',
-        owner: req.user.uid,
-        members: [req.user.uid],
-        forms: []
-      });
-      await defaultWorkspace.save();
-      console.log('Default workspace created for:', req.user.email);
-    }
+    await Workspace.findOneAndUpdate(
+      { owner: req.user.uid, name: 'My Workspace' },
+      { $setOnInsert: { members: [req.user.uid], forms: [] } },
+      { upsert: true, new: true }
+    );
 
     req.dbUser = user;
     next();

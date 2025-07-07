@@ -241,7 +241,7 @@ const FormSubmit = () => {
       <div className={`form-submit ${isDirectFormAccess ? 'direct-access' : ''}`}>
         <div className="error-container">
           <h2>Access Denied</h2>
-          <p>You don't have permission to access this form.</p>
+          <p>You are not authorized to respond to this form.<br/>If you think this is a mistake, kindly contact the owner.</p>
           <button onClick={() => navigate('/')} className="back-btn">
             Go Back Home
           </button>
