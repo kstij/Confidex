@@ -76,15 +76,14 @@ const Navbar = ({ user }) => {
         
         {/* Center Nav Links */}
         <ul className="navbar-links">
-          <li><a href="#about">About us</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#blogs">Blogs</a></li>
+          <li><Link to="/about">About us</Link></li>
+          <li><Link to="/pricing">Pricing</Link></li>
+          <li><Link to="/blogs">Blogs</Link></li>
         </ul>
         
         {/* Right Auth Buttons */}
         <div className="navbar-auth">
           <Link to="/login" className="navbar-btn login">Log In</Link>
-          <Link to="/login" className="navbar-btn signup">Sign In</Link>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -102,11 +101,10 @@ const Navbar = ({ user }) => {
       {isMobileMenuOpen && (
         <div className="navbar-mobile-menu">
           <ul className="navbar-mobile-links">
-            <li><a href="#about">About us</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#blogs">Blogs</a></li>
+            <li><Link to="/about">About us</Link></li>
+            <li><Link to="/pricing">Pricing</Link></li>
+            <li><Link to="/blogs">Blogs</Link></li>
             <li><Link to="/login" className="navbar-btn login">Log In</Link></li>
-            <li><Link to="/login" className="navbar-btn signup">Sign In</Link></li>
           </ul>
         </div>
       )}

@@ -17,6 +17,7 @@ import CollaborateAccept from './pages/CollaborateAccept';
 import Settings from './pages/Settings';
 import ComingSoon from './pages/ComingSoon';
 import FormClosed from './pages/FormClosed';
+import AboutUs from './pages/AboutUs';
 import './App.css';
 
 function App() {
@@ -94,6 +95,9 @@ function App() {
           <Route path="/settings" element={userLoading ? <ProtectedSpinner /> : <ProtectedRoute user={user}><Settings user={user} /></ProtectedRoute>} />
           <Route path="/coming-soon" element={<ComingSoon />} />
           <Route path="/form-closed" element={<FormClosed />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/pricing" element={<ComingSoon />} />
+          <Route path="/blogs" element={<ComingSoon />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     </div>
