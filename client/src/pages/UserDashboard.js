@@ -178,6 +178,15 @@ const UserDashboard = ({ user }) => {
     });
   };
 
+  // CSV Injection Mitigation: Escape dangerous values
+  function escapeCSVFormula(val) {
+    if (typeof val !== 'string') return val;
+    if (/^[=+\-@]/.test(val)) {
+      return "'" + val;
+    }
+    return val;
+  }
+
   // Sidebar workspace count
   const workspaceCount = forms.length;
 
@@ -200,9 +209,9 @@ const UserDashboard = ({ user }) => {
     const headers = ['Response #', 'Name', 'Email', 'Submission Date', 'Status'];
     const csvData = responses.map((response, index) => [
       index + 1,
-      response.submitterName,
-      response.submitterEmail,
-      formatDate(response.submittedAt),
+      escapeCSVFormula(response.submitterName),
+      escapeCSVFormula(response.submitterEmail),
+      escapeCSVFormula(formatDate(response.submittedAt)),
       'Submitted'
     ]);
 
@@ -238,7 +247,7 @@ const UserDashboard = ({ user }) => {
       selectedForm.questions.forEach(question => {
         const answer = response.answers[question.id];
         const formattedAnswer = Array.isArray(answer) ? answer.join('; ') : (answer || 'No answer');
-        row.push(formattedAnswer);
+        row.push(escapeCSVFormula(formattedAnswer));
       });
       
       return row;
@@ -707,7 +716,8 @@ const UserDashboard = ({ user }) => {
                         const rows = responses.map(resp =>
                           selectedForm.questions.map(q => {
                             const ans = resp.answers[q.id];
-                            return Array.isArray(ans) ? ans.join('; ') : (ans || '');
+                            // CSV Injection Mitigation for responses export
+                            return escapeCSVFormula(Array.isArray(ans) ? ans.join('; ') : (ans || ''));
                           })
                         );
                         const csvContent = 'data:text/csv;charset=utf-8,' +
@@ -721,7 +731,7 @@ const UserDashboard = ({ user }) => {
                         document.body.removeChild(link);
                       } else {
                         if (!responders.length) return;
-                        const csvContent = 'data:text/csv;charset=utf-8,' + ['Responder Name', ...responders].map(email => `"${email}"`).join('\n');
+                        const csvContent = 'data:text/csv;charset=utf-8,' + ['Responder Name', ...responders].map(email => `"${escapeCSVFormula(email)}"`).join('\n');
                         const encodedUri = encodeURI(csvContent);
                         const link = document.createElement('a');
                         link.setAttribute('href', encodedUri);
