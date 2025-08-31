@@ -200,8 +200,8 @@ const UserDashboard = ({ user }) => {
     const headers = ['Response #', 'Name', 'Email', 'Submission Date', 'Status'];
     const csvData = responses.map((response, index) => [
       index + 1,
-      response.submitterName,
-      response.submitterEmail,
+      sanitizeForCSV(response.submitterName),
+      sanitizeForCSV(response.submitterEmail),
       formatDate(response.submittedAt),
       'Submitted'
     ]);
@@ -221,6 +221,16 @@ const UserDashboard = ({ user }) => {
     document.body.removeChild(link);
   };
 
+  // CSV Injection Sanitizer
+  function sanitizeForCSV(value) {
+    if (typeof value !== 'string') return value;
+    // If value starts with =, +, -, or @, prefix with a single quote
+    if (/^[=+\-@]/.test(value)) {
+      return "'" + value;
+    }
+    return value;
+  }
+
   // Export responses as CSV (anonymous format)
   const exportResponses = () => {
     if (!responses.length || !selectedForm) {
@@ -229,7 +239,7 @@ const UserDashboard = ({ user }) => {
     }
 
     // Create headers with question labels
-    const headers = ['Response #', ...selectedForm.questions.map(q => q.label)];
+    const headers = ['Response #', ...selectedForm.questions.map(q => sanitizeForCSV(q.label))];
     
     // Create CSV data
     const csvData = responses.map((response, index) => {
@@ -237,7 +247,8 @@ const UserDashboard = ({ user }) => {
       
       selectedForm.questions.forEach(question => {
         const answer = response.answers[question.id];
-        const formattedAnswer = Array.isArray(answer) ? answer.join('; ') : (answer || 'No answer');
+        let formattedAnswer = Array.isArray(answer) ? answer.join('; ') : (answer || 'No answer');
+        formattedAnswer = sanitizeForCSV(formattedAnswer);
         row.push(formattedAnswer);
       });
       
@@ -703,11 +714,12 @@ const UserDashboard = ({ user }) => {
                     <button className="tf-export-csv-btn" onClick={() => {
                       if (responsesView === 'responses') {
                         if (!responses.length || !selectedForm) return;
-                        const headers = selectedForm.questions.map(q => q.label);
+                        const headers = selectedForm.questions.map(q => sanitizeForCSV(q.label));
                         const rows = responses.map(resp =>
                           selectedForm.questions.map(q => {
                             const ans = resp.answers[q.id];
-                            return Array.isArray(ans) ? ans.join('; ') : (ans || '');
+                            let formatted = Array.isArray(ans) ? ans.join('; ') : (ans || '');
+                            return sanitizeForCSV(formatted);
                           })
                         );
                         const csvContent = 'data:text/csv;charset=utf-8,' +
@@ -721,7 +733,7 @@ const UserDashboard = ({ user }) => {
                         document.body.removeChild(link);
                       } else {
                         if (!responders.length) return;
-                        const csvContent = 'data:text/csv;charset=utf-8,' + ['Responder Name', ...responders].map(email => `"${email}"`).join('\n');
+                        const csvContent = 'data:text/csv;charset=utf-8,' + ['Responder Name', ...responders].map(email => `"${sanitizeForCSV(email)}"`).join('\n');
                         const encodedUri = encodeURI(csvContent);
                         const link = document.createElement('a');
                         link.setAttribute('href', encodedUri);
