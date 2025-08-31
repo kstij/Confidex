@@ -4,6 +4,23 @@ import { auth } from '../firebase';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import './Login.css';
 
+// Helper function to validate returnUrl
+function isSafeReturnUrl(url) {
+  // Only allow relative paths that start with '/'
+  // Disallow protocol-relative (//) and absolute URLs
+  if (!url) return false;
+  try {
+    // Disallow URLs containing '//' before any '?', to prevent protocol-relative URLs
+    // Only allow URLs that start with a single '/'
+    if (url.startsWith('/') && !url.startsWith('//') && !url.includes('://')) {
+      return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,7 +33,7 @@ const Login = () => {
     // Check if user is already logged in
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        if (returnUrl) {
+        if (returnUrl && isSafeReturnUrl(returnUrl)) {
           navigate(returnUrl);
         } else {
           navigate('/dashboard');
@@ -39,7 +56,7 @@ const Login = () => {
       
       // Navigate after successful login
       setTimeout(() => {
-        if (returnUrl) {
+        if (returnUrl && isSafeReturnUrl(returnUrl)) {
           navigate(returnUrl);
         } else {
           navigate('/dashboard');
