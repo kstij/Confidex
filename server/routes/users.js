@@ -71,28 +71,44 @@ router.get('/workspaces', verifyToken, ensureUserExists, async (req, res) => {
 // DELETE /users/me - delete user account and all associated data
 router.delete('/me', verifyToken, ensureUserExists, async (req, res) => {
   try {
+    // Require reauthentication by verifying a fresh Firebase token
+    const authHeader = req.headers['x-reauth-id-token'] || req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Reauthentication required: No token provided' });
+    }
+    const token = authHeader.split('Bearer ')[1];
+    // Verify the token and check auth_time is recent (within 5 minutes)
+    const admin = require('firebase-admin');
+    let decodedToken;
+    try {
+      decodedToken = await admin.auth().verifyIdToken(token, true); // 'true' enforces token is freshly issued
+    } catch (err) {
+      return res.status(401).json({ error: 'Reauthentication required: Invalid or expired token' });
+    }
+    // Check auth_time is recent (within 5 minutes)
+    const now = Math.floor(Date.now() / 1000);
+    if (!decodedToken.auth_time || now - decodedToken.auth_time > 300) {
+      return res.status(401).json({ error: 'Reauthentication required: Token too old' });
+    }
+    if (decodedToken.uid !== req.user.uid) {
+      return res.status(401).json({ error: 'Reauthentication required: Token user mismatch' });
+    }
     const userId = req.user.uid;
-    
     // Delete all forms created by the user
     await Form.deleteMany({ creatorUid: userId });
-    
     // Delete all responses to forms created by the user
     const userForms = await Form.find({ creatorUid: userId });
     const formIds = userForms.map(form => form._id);
     await Response.deleteMany({ formId: { $in: formIds } });
-    
     // Delete all workspaces owned by the user
     await Workspace.deleteMany({ owner: userId });
-    
     // Remove user from workspaces where they are a member but not owner
     await Workspace.updateMany(
       { members: userId, owner: { $ne: userId } },
       { $pull: { members: userId } }
     );
-    
     // Delete the user document
     await User.deleteOne({ uid: userId });
-    
     res.json({ success: true, message: 'Account and all associated data deleted successfully' });
   } catch (err) {
     console.error('Error deleting user account:', err);
