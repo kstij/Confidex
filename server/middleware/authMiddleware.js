@@ -2,6 +2,16 @@ const admin = require('firebase-admin');
 const User = require('../models/User');
 const Workspace = require('../models/Workspace');
 
+// Allowed email domains for access control
+const ALLOWED_EMAIL_DOMAINS = ['company.com', 'partner.org'];
+
+// Helper to check if email is from allowed domain
+function isEmailFromAllowedDomain(email) {
+  if (!email || typeof email !== 'string') return false;
+  const domain = email.split('@')[1];
+  return ALLOWED_EMAIL_DOMAINS.includes(domain);
+}
+
 // Verify Firebase token and get user info
 const verifyToken = async (req, res, next) => {
   try {
@@ -22,6 +32,11 @@ const verifyToken = async (req, res, next) => {
       email: decodedToken.email,
       name: decodedToken.name || decodedToken.email.split('@')[0]
     };
+
+    // Enforce domain-based access control
+    if (!isEmailFromAllowedDomain(req.user.email)) {
+      return res.status(403).json({ error: 'Access denied: unauthorized email domain' });
+    }
     
     next();
   } catch (error) {
@@ -33,6 +48,11 @@ const verifyToken = async (req, res, next) => {
 // Ensure user exists in database
 const ensureUserExists = async (req, res, next) => {
   try {
+    // Defensive: double-check domain in case verifyToken is not used as middleware
+    if (!isEmailFromAllowedDomain(req.user.email)) {
+      return res.status(403).json({ error: 'Access denied: unauthorized email domain' });
+    }
+
     let user = await User.findOne({ email: req.user.email });
     
     if (!user) {
